@@ -38,6 +38,8 @@
           <element id="library" level="project" name="Maven: org.glassfish.hk2:hk2-api:3.0.1" />
           <element id="library" level="project" name="Maven: org.glassfish.hk2:hk2-utils:3.0.1" />
           <element id="library" level="project" name="Maven: org.javassist:javassist:3.25.0-GA" />
+          <element id="library" level="project" name="Maven: org.postgresql:postgresql:42.5.4" />
+          <element id="library" level="project" name="Maven: org.checkerframework:checker-qual:3.5.0" />
         </element>
       </element>
       <element id="directory" name="META-INF">

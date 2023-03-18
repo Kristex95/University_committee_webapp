@@ -8,10 +8,9 @@
 <h1><%= "Hello World!" %>
 </h1>
 <br/>
-<a href="hello-servlet">Hello Servlet</a>
 
-<form method="post">
+<p><a href="faculty">All faculties</a></p>
+<p><a href="abiturient">All abiturients</a></p>
 
-</form>
 </body>
 </html>
