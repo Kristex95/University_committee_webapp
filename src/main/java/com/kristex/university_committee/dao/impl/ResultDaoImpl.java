@@ -12,6 +12,15 @@ import java.util.List;
 
 public class ResultDaoImpl implements ResultDao {
 
+    private static ResultDaoImpl instance;
+
+    public static synchronized ResultDaoImpl getInstance(){
+        if(instance == null){
+            instance = new ResultDaoImpl();
+        }
+        return instance;
+    }
+
     @Override
     public Result GetResultById(int id) {
         Result result = null;

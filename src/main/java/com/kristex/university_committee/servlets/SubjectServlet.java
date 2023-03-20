@@ -1,14 +1,15 @@
 package com.kristex.university_committee.servlets;
 
-import com.kristex.university_committee.dao.impl.FacultyDaoImpl;
 import com.kristex.university_committee.dao.impl.SubjectDaoImpl;
-import com.kristex.university_committee.model.Faculty;
 import com.kristex.university_committee.model.Subject;
+import com.kristex.university_committee.service.SubjectService;
+import com.kristex.university_committee.utils.JSONParser;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.json.JSONArray;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -19,7 +20,7 @@ public class SubjectServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("text/html");
+        resp.setContentType("application/json");
 
 
         SubjectDaoImpl subjectDao = new SubjectDaoImpl();
@@ -27,20 +28,29 @@ public class SubjectServlet extends HttpServlet {
 
         String subjectID = req.getPathInfo();
         if(subjectID != null) {
+
+    //by id
+
             subjectID = subjectID.substring(1);
 
-            Subject subject = subjectDao.GetSubjectById(Integer.valueOf(subjectID));
+            Subject subject = SubjectService.getInstance().GetSubjectById(Integer.valueOf(subjectID));
             if(subject==null){
                 out.println("Faculty not found");
                 return;
             }
-            out.println("<p>" + subject + "</p>");
+            out.println(JSONParser.getInstance().getSubjectJSON(subject));
         }
         else {
-            List<Subject> subjectList = subjectDao.GetAllSubjects();
+
+    //all
+
+            List<Subject> subjectList = SubjectService.getInstance().GetAllSubjects();
+            JSONArray jsonArray = new JSONArray();
             for (Subject subject: subjectList) {
-                out.println("<p>" + subject + "</p>");
+                jsonArray.put(JSONParser.getInstance().getSubjectJSON(subject));
             }
+
+            out.println(jsonArray);
         }
     }
 }

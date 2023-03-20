@@ -10,7 +10,7 @@
 <br/>
 
 <p><a href="faculty">All faculties</a></p>
-<p><a href="abiturient">All abiturients</a></p>
+<p><a href="user">All abiturients</a></p>
 
 </body>
 </html>

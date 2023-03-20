@@ -11,6 +11,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SubjectDaoImpl implements SubjectDao {
+
+    private static SubjectDaoImpl instance;
+
+    public static synchronized SubjectDaoImpl getInstance() {
+        if (instance == null){
+            instance = new SubjectDaoImpl();
+        }
+        return instance;
+    }
+
     @Override
     public Subject GetSubjectById(int id) {
 
@@ -55,7 +65,6 @@ public class SubjectDaoImpl implements SubjectDao {
                 int id = resultSet.getInt(1);
                 String name = resultSet.getString(2);
                 subjectList.add(new Subject(id, name));
-                System.out.println(id + ": " + name);
             }
             System.out.println("<End of list>");
 
