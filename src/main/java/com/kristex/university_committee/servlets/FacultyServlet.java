@@ -4,6 +4,7 @@ import com.kristex.university_committee.dao.impl.FacultyDaoImpl;
 import com.kristex.university_committee.model.Faculty;
 import com.kristex.university_committee.service.FacultyService;
 import com.kristex.university_committee.utils.JSONParser;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -68,6 +69,20 @@ public class FacultyServlet extends HttpServlet {
 
             FacultyService.updateFaculty(updatedFaculty);
         }
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("text/html");
+        String pathInfo = req.getPathInfo();
+
+        if(pathInfo==null || pathInfo.equals("/")){
+            return;
+        }
+
+        Integer id = Integer.valueOf(pathInfo.substring(1));
+
+        FacultyService.deleteFaculty(id);
     }
 
     public void destroy() {

@@ -22,7 +22,7 @@ public class SubjectDaoImpl implements SubjectDao {
     }
 
     @Override
-    public Subject GetSubjectById(int id) {
+    public Subject getSubjectById(int id) {
 
         Subject subject = null;
 
@@ -52,7 +52,7 @@ public class SubjectDaoImpl implements SubjectDao {
     }
 
     @Override
-    public List<Subject> GetAllSubjects() {
+    public List<Subject> getAllSubjects() {
         List<Subject> subjectList = new ArrayList<>();
 
         ConnectionPool connectionPool = ConnectionPool.getConnectionPool();
@@ -76,5 +76,57 @@ public class SubjectDaoImpl implements SubjectDao {
         }
 
         return subjectList;
+    }
+
+    public void createSubject(Subject subject){
+        ConnectionPool connectionPool = ConnectionPool.getConnectionPool();
+        try(Connection connection = connectionPool.getConnection()){
+            String query =  "INSERT INTO subject (name)" +
+                            "VALUES (?)";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, subject.getName());
+            statement.executeQuery();
+
+            statement.close();
+            connectionPool.releaseConnection(connection);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    @Override
+    public void updateSubject(Subject subject) {
+        ConnectionPool connectionPool = ConnectionPool.getConnectionPool();
+        try(Connection connection = connectionPool.getConnection()){
+            String query =  "UPDATE subject " +
+                            "SET name = ? " +
+                            "WHERE id = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, subject.getName());
+            statement.setInt(2, subject.getId());
+            statement.executeQuery();
+
+            statement.close();
+            connectionPool.releaseConnection(connection);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    @Override
+    public void deleteSubject(int id) {
+        ConnectionPool connectionPool = ConnectionPool.getConnectionPool();
+        Connection connection = connectionPool.getConnection()){
+            String query =  "DELETE FROM subject " +
+                            "WHERE id = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, id);
+            statement.executeQuery();
+
+            statement.close();
+            connectionPool.releaseConnection(connection);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
 }

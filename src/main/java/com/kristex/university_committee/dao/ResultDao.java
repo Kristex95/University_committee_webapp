@@ -6,6 +6,9 @@ import java.util.List;
 
 public interface ResultDao {
 
-    public Result GetResultById(int id);
-    public List<Result> GetAllResults();
+    Result GetResultById(int id);
+    List<Result> GetAllResults();
+    void createResult(Result result);
+    void updateResult(Result result);
+    void deleteResult(int id);
 }

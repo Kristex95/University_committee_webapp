@@ -6,6 +6,9 @@ import java.util.List;
 
 public interface SubjectDao {
 
-    public Subject GetSubjectById(int id);
-    public List<Subject> GetAllSubjects();
+    public Subject getSubjectById(int id);
+    public List<Subject> getAllSubjects();
+    public void createSubject(Subject subject);
+    void updateSubject(Subject subject);
+    void deleteSubject(int id);
 }

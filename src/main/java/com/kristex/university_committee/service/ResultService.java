@@ -16,11 +16,20 @@ public class ResultService {
         return instance;
     }
 
-    public Result GetResultById(int id){
+    public static Result getResultById(int id){
         return ResultDaoImpl.getInstance().GetResultById(id);
     }
 
-    public List<Result> GetAllResults(){
+    public static List<Result> getAllResults(){
         return ResultDaoImpl.getInstance().GetAllResults();
+    }
+    public static void createResult(Result result){
+        ResultDaoImpl.getInstance().createResult(result);
+    }
+    public static void updateResult(Result result){
+        ResultDaoImpl.getInstance().updateResult(result);
+    }
+    public static void deleteResult(int id){
+        ResultDaoImpl.getInstance().deleteResult(id);
     }
 }

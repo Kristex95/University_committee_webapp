@@ -12,4 +12,8 @@ import lombok.ToString;
 public class Subject {
     int id;
     String name;
+
+    public Subject(String name){
+        this.name = name;
+    }
 }

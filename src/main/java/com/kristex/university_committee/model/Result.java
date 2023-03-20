@@ -14,4 +14,10 @@ public class Result {
     Integer abitId;
     Integer subjId;
     Float grade;
+
+    public Result(Integer abitId, Integer subjId, Float grade){
+        this.abitId = abitId;
+        this.subjId = subjId;
+        this.grade = grade;
+    }
 }

@@ -15,11 +15,23 @@ public class SubjectService {
         return instance;
     }
 
-    public Subject GetSubjectById(int id){
-        return SubjectDaoImpl.getInstance().GetSubjectById(id);
+    public static Subject GetSubjectById(int id){
+        return SubjectDaoImpl.getInstance().getSubjectById(id);
     }
 
-    public List<Subject> GetAllSubjects(){
-        return SubjectDaoImpl.getInstance().GetAllSubjects();
+    public static List<Subject> GetAllSubjects(){
+        return SubjectDaoImpl.getInstance().getAllSubjects();
+    }
+
+    public static void createSubject(Subject subject){
+        SubjectDaoImpl.getInstance().createSubject(subject);
+    }
+
+    public static void updateSubject(Subject subject){
+        SubjectDaoImpl.getInstance().updateSubject(subject);
+    }
+
+    public static void deleteSubject(int id){
+        SubjectDaoImpl.getInstance().deleteSubject(id);
     }
 }

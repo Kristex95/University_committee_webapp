@@ -83,4 +83,61 @@ public class ResultDaoImpl implements ResultDao {
 
         return resultList;
     }
+
+    @Override
+    public void createResult(Result result) {
+        ConnectionPool connectionPool = ConnectionPool.getConnectionPool();
+        try (Connection connection = connectionPool.getConnection()){
+            String query =  "INSERT INTO result (abit_id, subj_id, grade)" +
+                            "VALUES (?,?,?)";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, result.getAbitId());
+            statement.setInt(2, result.getSubjId());
+            statement.setFloat(3, result.getGrade());
+            statement.executeQuery();
+
+            statement.close();
+            connectionPool.releaseConnection(connection);
+        }catch (Exception e){
+            System.out.println(e);
+        }
+    }
+
+    @Override
+    public void updateResult(Result result) {
+        ConnectionPool connectionPool = ConnectionPool.getConnectionPool();
+        try (Connection connection = connectionPool.getConnection()){
+            String query =  "UPDATE result " +
+                            "SET abit_id = ?, subj_id = ?, grade = ? " +
+                            "WHERE id = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, result.getAbitId());
+            statement.setInt(2, result.getSubjId());
+            statement.setFloat(3, result.getGrade());
+            statement.setInt(4, result.getId());
+            statement.executeQuery();
+
+            statement.close();
+            connectionPool.releaseConnection(connection);
+        }catch (Exception e){
+            System.out.println(e);
+        }
+    }
+
+    @Override
+    public void deleteResult(int id) {
+        ConnectionPool connectionPool = ConnectionPool.getConnectionPool();
+        try (Connection connection = connectionPool.getConnection()){
+            String query =  "DELETE FROM result " +
+                            "WHERE id = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, id);
+            statement.executeQuery();
+
+            statement.close();
+            connectionPool.releaseConnection(connection);
+        }catch (Exception e){
+            System.out.println(e);
+        }
+    }
 }
