@@ -85,7 +85,10 @@ public class FacultyDaoImpl implements FacultyDao {
                             "VALUES (?)";
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1, faculty.getName());
-            statement.executeQuery();
+
+            if (statement.executeUpdate() <= 0){
+                System.out.println("SQL cannot create Faculty");
+            }
 
             statement.close();
             connectionPool.releaseConnection(connection);
@@ -104,7 +107,10 @@ public class FacultyDaoImpl implements FacultyDao {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1, faculty.getName());
             statement.setInt(2, faculty.getId());
-            statement.executeQuery();
+
+            if (statement.executeUpdate() <= 0){
+                System.out.println("SQL cannot update Faculty");
+            }
 
             statement.close();
             connectionPool.releaseConnection(connection);
@@ -121,7 +127,10 @@ public class FacultyDaoImpl implements FacultyDao {
                             "WHERE id = ?";
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, id);
-            statement.executeQuery();
+
+            if (statement.executeUpdate() <= 0){
+                System.out.println("SQL cannot delete Faculty");
+            }
 
             statement.close();
             connectionPool.releaseConnection(connection);

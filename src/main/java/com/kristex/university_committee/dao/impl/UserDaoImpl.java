@@ -13,9 +13,9 @@ import java.util.List;
 
 public class UserDaoImpl implements UserDao {
 
-    private static UserDao instance;
+    private static UserDaoImpl instance;
 
-    public static synchronized UserDao getInstance(){
+    public static synchronized UserDaoImpl getInstance(){
         if(instance == null){
             instance = new UserDaoImpl();
         }
@@ -23,7 +23,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public List<User> GetAllUsers() {
+    public List<User> getAllUsers() {
         List<User> userList = new ArrayList<>();
 
         ConnectionPool connectionPool = ConnectionPool.getConnectionPool();
@@ -34,7 +34,7 @@ public class UserDaoImpl implements UserDao {
 
             while(resultIdSet.next()){
                 int id = resultIdSet.getInt(1);
-                User user = GetUserById(id);
+                User user = getUserById(id);
 
                 System.out.println(user);
                 userList.add(user);
@@ -50,7 +50,7 @@ public class UserDaoImpl implements UserDao {
         return userList;
     }
 
-    public User GetUserById(int id){
+    public User getUserById(int id){
 
         User user = null;
 
@@ -65,14 +65,11 @@ public class UserDaoImpl implements UserDao {
                 Integer user_id = resultSet.getInt(1);
                 String user_first_name = resultSet.getString(2);
                 String user_last_name = resultSet.getString(3);
-                Integer user_school_grade = resultSet.getInt(4);
-                Integer user_faculty_id = resultSet.getInt(5);
-                String user_email = resultSet.getString(6);
-                Role user_role = Role.valueOf(resultSet.getString(7));
-                String user_cache = resultSet.getString(8);
-                String user_salt = resultSet.getString(9);
+                String user_email = resultSet.getString(4);
+                Role user_role = Role.valueOf(resultSet.getString(5));
+                String user_cache = resultSet.getString(6);
 
-                user = new User(user_id, user_first_name, user_last_name, user_school_grade, user_faculty_id, user_email, user_role, user_cache, user_salt);
+                user = new User(user_id, user_first_name, user_last_name, user_email, user_role, user_cache);
             }
 
             resultSet.close();
@@ -82,6 +79,117 @@ public class UserDaoImpl implements UserDao {
             System.out.println(e);
         }
 
+        return user;
+    }
+
+    @Override
+    public void createUser(User user) {
+        ConnectionPool connectionPool = ConnectionPool.getConnectionPool();
+        try(Connection connection = connectionPool.getConnection()){
+
+
+            String query = "INSERT INTO public.user (first_name, last_name, email, role, cache)" +
+                    "VALUES (?,?,?,?::role,?)";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, user.getFirstName());
+            statement.setString(2, user.getLastName());
+            statement.setString(3, user.getEmail());
+            statement.setString(4, String.valueOf(user.getRole()).toUpperCase());
+            statement.setString(5, user.getCache());
+
+
+            if (statement.executeUpdate() <= 0){
+                System.out.println("SQL cannot create User");
+            }
+
+            statement.close();
+            connectionPool.releaseConnection(connection);
+        }catch (Exception e){
+            System.out.println(e);
+        }
+    }
+
+    @Override
+    public void updateUser(User user) {
+        ConnectionPool connectionPool = ConnectionPool.getConnectionPool();
+        try(Connection connection = connectionPool.getConnection()){
+
+            String query =  "UPDATE public.user " +
+                            "SET first_name = ?, last_name = ?, email = ?, role = ?::role, cache = ? " +
+                            "WHERE id = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, user.getFirstName());
+            statement.setString(2, user.getLastName());
+            statement.setString(3, user.getEmail());
+            statement.setString(4, String.valueOf(user.getRole()).toUpperCase());
+            statement.setString(5, user.getCache());
+            statement.setInt(6, user.getId());
+
+            if (statement.executeUpdate() <= 0){
+                System.out.println("SQL cannot update User");
+            }
+
+            statement.close();
+            connectionPool.releaseConnection(connection);
+        }catch (Exception e){
+            System.out.println(e);
+        }
+    }
+
+    @Override
+    public void deleteUser(int id) {
+        ConnectionPool connectionPool = ConnectionPool.getConnectionPool();
+        try(Connection connection = connectionPool.getConnection()){
+            String query =  "DELETE FROM public.user " +
+                            "WHERE id = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, id);
+
+
+            if (statement.executeUpdate() <= 0){
+                System.out.println("SQL cannot delete User");
+            }
+
+
+            statement.close();
+            connectionPool.releaseConnection(connection);
+        }catch (Exception e){
+            System.out.println(e);
+        }
+    }
+
+    @Override
+    public User getByEmail(String email) {
+        ConnectionPool connectionPool = ConnectionPool.getConnectionPool();
+        User user = null;
+
+        try(Connection connection = connectionPool.getConnection()){
+
+
+            String query =  "SELECT * FROM public.user " +
+                            "WHERE email = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, email);
+            ResultSet resultSet = statement.executeQuery();
+
+            if(resultSet.next()){
+                Integer user_id = resultSet.getInt(1);
+                String user_first_name = resultSet.getString(2);
+                String user_last_name = resultSet.getString(3);
+                String user_email = resultSet.getString(4);
+                Role user_role = Role.valueOf(resultSet.getString(5));
+                String user_cache = resultSet.getString(6);
+
+                user = new User(user_id, user_first_name, user_last_name, user_email, user_role, user_cache);
+
+            }
+
+
+            statement.close();
+            connectionPool.releaseConnection(connection);
+        }catch (Exception e){
+            System.out.println(e);
+        }
         return user;
     }
 }

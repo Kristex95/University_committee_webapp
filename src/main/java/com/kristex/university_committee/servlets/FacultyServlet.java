@@ -63,12 +63,18 @@ public class FacultyServlet extends HttpServlet {
             Faculty newFaculty = new Faculty(json.getString("name"));
             FacultyService.createFaculty(newFaculty);
         }
-        else {  //update
-            Integer id = Integer.valueOf(pathInfo.substring(1));
-            Faculty updatedFaculty = new Faculty(id,json.getString("name"));
+    }
 
-            FacultyService.updateFaculty(updatedFaculty);
-        }
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("text/html");
+        String pathInfo = req.getPathInfo();
+        JSONObject json = JSONParser.parseJSON(req);
+
+        Integer id = Integer.valueOf(pathInfo.substring(1));
+        Faculty updatedFaculty = new Faculty(id,json.getString("name"));
+
+        FacultyService.updateFaculty(updatedFaculty);
     }
 
     @Override

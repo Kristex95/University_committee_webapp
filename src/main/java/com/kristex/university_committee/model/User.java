@@ -14,10 +14,16 @@ public class User {
     int id;
     String firstName;
     String lastName;
-    float schoolGrade;
-    int facultyId;
     String email;
     Role role;
     String cache;
-    String salt;
+
+    public User(String firstName, String lastName, String email, Role role, String cache){
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.role = role;
+        this.cache = cache;
+    }
 }
+
