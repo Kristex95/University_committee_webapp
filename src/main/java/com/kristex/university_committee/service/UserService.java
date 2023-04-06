@@ -4,7 +4,7 @@ import com.kristex.university_committee.dao.impl.UserDaoImpl;
 import com.kristex.university_committee.dao.impl.UserTokenDaoImpl;
 import com.kristex.university_committee.model.User;
 import com.kristex.university_committee.model.UserToken;
-import com.kristex.university_committee.utils.JWTTokenCreator;
+import com.kristex.university_committee.utils.JWTUtils;
 
 import java.security.MessageDigest;
 import java.util.Base64;
@@ -59,8 +59,8 @@ public class UserService {
         if(user.getCache().equals(hashPassword(pass))){
             UserTokenService.createUserToken(new UserToken(
                     user.getId(),
-                    JWTTokenCreator.createAccessToken(String.valueOf(user.getId())),
-                    JWTTokenCreator.createRefreshToken(String.valueOf(user.getId()))));
+                    JWTUtils.createAccessToken(String.valueOf(user.getId()), user.getRole()),
+                    JWTUtils.createRefreshToken(String.valueOf(user.getId()), user.getRole())));
             return UserTokenDaoImpl.getInstance().getByUserId(user.getId());
         }
         else {

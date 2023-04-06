@@ -5,6 +5,7 @@ import com.kristex.university_committee.model.User;
 import com.kristex.university_committee.model.UserToken;
 import com.kristex.university_committee.service.UserService;
 import com.kristex.university_committee.utils.JSONParser;
+import com.kristex.university_committee.utils.JWTUtils;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
