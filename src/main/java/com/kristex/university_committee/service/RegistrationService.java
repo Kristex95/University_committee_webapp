@@ -19,6 +19,7 @@ public class RegistrationService {
     public static Registration getById(int id){
         return RegistrationDaoImpl.getInstance().getById(id);
     }
+    public static Registration getByUserId(int id) {return RegistrationDaoImpl.getInstance().getByUserId(id);}
 
     public static List<Registration> getAllList() {
         return RegistrationDaoImpl.getInstance().getAllList();

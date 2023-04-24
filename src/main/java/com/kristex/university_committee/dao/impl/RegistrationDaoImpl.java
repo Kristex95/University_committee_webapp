@@ -35,12 +35,38 @@ public class RegistrationDaoImpl implements RegistrationDao {
             if(resultSet.next()){
                 int user_id = resultSet.getInt(2);
                 int faculty_id = resultSet.getInt(3);
-                float school_mark = resultSet.getFloat(4);
-                int math_mark = resultSet.getInt(5);
-                int history_mark = resultSet.getInt(6);
-                int english_mark = resultSet.getInt(7);
 
-                registration = new Registration(id, user_id, faculty_id, school_mark, math_mark, history_mark,english_mark);
+
+                registration = new Registration(id, user_id, faculty_id);
+            }
+
+            resultSet.close();
+            statement.close();
+            connectionPool.releaseConnection(connection);
+        }catch (Exception e){
+            System.out.println(e);
+        }
+
+        return registration;
+    }
+
+    @Override
+    public Registration getByUserId(int id){
+        Registration registration = null;
+
+        ConnectionPool connectionPool = ConnectionPool.getConnectionPool();
+        try(Connection connection = connectionPool.getConnection()){
+            String facultyAndAbiturientQuery =  "Select * FROM registration WHERE user_id = ?";
+            PreparedStatement statement = connection.prepareStatement(facultyAndAbiturientQuery);
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+
+            if(resultSet.next()){
+                int registration_id = resultSet.getInt(1);
+                int faculty_id = resultSet.getInt(3);
+
+
+                registration = new Registration(registration_id, id, faculty_id);
             }
 
             resultSet.close();
@@ -87,15 +113,12 @@ public class RegistrationDaoImpl implements RegistrationDao {
         try(Connection connection = connectionPool.getConnection()){
 
 
-            String query =  "INSERT INTO registration (user_id, faculty_id, school_mark, math_mark, history_mark, english_mark) " +
-                            "VALUES (?,?,?,?,?,?)";
+            String query =  "INSERT INTO registration (user_id, faculty_id) " +
+                            "VALUES (?,?)";
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, registration.getUserId());
             statement.setInt(2, registration.getFacultyId());
-            statement.setFloat(3, registration.getSchoolMark());
-            statement.setInt(4, registration.getMathMark());
-            statement.setInt(5, registration.getHistoryMark());
-            statement.setInt(6, registration.getEnglishMark());
+
 
 
             if (statement.executeUpdate() <= 0){
@@ -115,15 +138,11 @@ public class RegistrationDaoImpl implements RegistrationDao {
         try(Connection connection = connectionPool.getConnection()){
 
             String query =  "UPDATE registration " +
-                            "SET user_id = ?, faculty_id = ?, school_mark = ?, math_mark = ?, history_mark = ?, english_mark = ? " +
+                            "SET user_id = ?, faculty_id = ? " +
                             "WHERE id = ?";
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, registration.getUserId());
             statement.setInt(2, registration.getFacultyId());
-            statement.setFloat(3, registration.getSchoolMark());
-            statement.setInt(4, registration.getMathMark());
-            statement.setInt(5, registration.getHistoryMark());
-            statement.setInt(6, registration.getEnglishMark());
             statement.setInt(7, registration.getId());
 
             if (statement.executeUpdate() <= 0){

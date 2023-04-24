@@ -23,6 +23,9 @@ public class FacultyService {
     public static List<Faculty> GetAllFaculties(){
         return FacultyDaoImpl.getInstance().getAllFaculties();
     }
+    public static List<Faculty> GetAllFacultiesByUserId(int id){
+        return FacultyDaoImpl.getInstance().getAllFacultiesByUserId(id);
+    }
 
     public static void createFaculty(Faculty faculty){
         FacultyDaoImpl.getInstance().createFaculty(faculty);

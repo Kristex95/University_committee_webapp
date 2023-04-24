@@ -4,7 +4,6 @@ import com.kristex.university_committee.model.Role;
 import com.kristex.university_committee.model.User;
 import com.kristex.university_committee.service.UserService;
 import com.kristex.university_committee.utils.JSONParser;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,29 +18,80 @@ import java.util.List;
 @WebServlet("/user/*")
 public class UserServlet extends HttpServlet {
 
+    private final String FACULTY_USERS_SUBPATH = "/faculty/";
+    private final String UNCONFIRMED_USERS_SUBPATH = "/unconfirmed/";
+    private final String CONFIRM_USERS_SUBPATH = "/confirm/";
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
         PrintWriter out = resp.getWriter();
-        String abiturientID = req.getPathInfo();
+        String pathInfo = req.getPathInfo();
+        JSONObject params = (JSONObject) req.getAttribute("params");
+        if(pathInfo != null) {
 
-        if(abiturientID != null) {
+            if(pathInfo.contains(FACULTY_USERS_SUBPATH)) {
+                //All users by faculty id
+                String faculty_id = pathInfo.substring(FACULTY_USERS_SUBPATH.length());
 
-//one abiturient by id
+                List<User> userList = UserService.getInstance().getAllUsersByFacultyId(Integer.parseInt(faculty_id));
 
-            abiturientID = abiturientID.substring(1);
+                if (userList.isEmpty()) {
+                    System.out.println("No users");
+                    return;
+                }
 
-            User user = UserService.getInstance().getUserById(Integer.parseInt(abiturientID));
-            if(user ==null){
-                out.println("Abiturient not found");
-                return;
+
+                JSONArray jsonArray = new JSONArray();
+                for (User user : userList) {
+                    jsonArray.put(JSONParser.getUserSimpleJSON(user));
+                }
+                out.println(jsonArray);
+
+            } else if (pathInfo.contains(UNCONFIRMED_USERS_SUBPATH)) {
+
+                List<User> userList = UserService.getInstance().getAllUnconfirmedUsers();
+
+                if (userList.isEmpty()) {
+                    System.out.println("No users");
+                    return;
+                }
+
+                JSONArray jsonArray = new JSONArray();
+                for (User user : userList) {
+                    jsonArray.put(JSONParser.getUserJSON(user));
+                }
+                out.println(jsonArray);
+
+            } else if(pathInfo.contains("/client")){
+                //returns logged in user info
+                User user = UserService.getInstance().getUserById(params.getInt("id"));
+                if (user == null) {
+                    out.println("Abiturient not found");
+                    return;
+                }
+
+                JSONObject userJSON = JSONParser.getUserWithFacultyJSON(user);
+
+                out.println(userJSON);
+            }
+            else {
+                //one abiturient by id
+
+
+                User user = UserService.getInstance().getUserById(Integer.valueOf(pathInfo.substring(1)));
+                if (user == null) {
+                    out.println("Abiturient not found");
+                    return;
+                }
+
+                //print
+
+                JSONObject userJSON = JSONParser.getUserWithFacultyJSON(user);
+
+                out.println(userJSON);
             }
 
-            //print
-
-            JSONObject userJSON = JSONParser.getUserJSON(user);
-
-            out.println(userJSON);
         }
         else {
 
@@ -53,7 +103,7 @@ public class UserServlet extends HttpServlet {
             JSONArray array = new JSONArray();
 
             for (User user : userList) {
-                array.put(JSONParser.getUserJSON(user));
+                array.put(JSONParser.getUserWithFacultyJSON(user));
             }
             out.println(array);
         }
@@ -63,36 +113,43 @@ public class UserServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("application/json");
         String pathInfo = req.getPathInfo();
-        JSONObject json = JSONParser.parseJSON(req);
 
-        if(pathInfo == null || pathInfo.equals("/")) {
+        JSONObject params = (JSONObject) req.getAttribute("params");
+
+        if(pathInfo.equals("/")) {
         //create
+            JSONObject json = JSONParser.parseJSON(req);
             User user = new User(
                     json.getString("first_name"),
                     json.getString("last_name"),
                     json.getString("email"),
-                    Role.valueOf(json.getString("role")),
                     UserService.hashPassword(json.getString("pass")));
             UserService.createUser(user);
+        }
+        else if (pathInfo.contains(CONFIRM_USERS_SUBPATH)) {
+            JSONObject json = JSONParser.parseJSON(req);
+            UserService.confirmUser(json.getInt("id"));
         }
     }
 
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        //update
         resp.setContentType("application/json");
         String pathInfo = req.getPathInfo();
+
         JSONObject json = JSONParser.parseJSON(req);
+        JSONObject params = (JSONObject) req.getAttribute("params");
+        User newUser = JSONParser.parseUserJSON(json);
 
-        User user = new User(
-                    json.getString("first_name"),
-                    json.getString("last_name"),
-                    json.getString("email"),
-                    Role.valueOf(json.getString("role")),
-                    UserService.hashPassword(json.getString("pass")));
+        User oldUser = UserService.getInstance().getUserById(params.getInt("id"));
 
+        if(oldUser.getSchool_mark() != newUser.getSchool_mark() || oldUser.getMath_mark() != newUser.getMath_mark() || oldUser.getEnglish_mark() != newUser.getEnglish_mark() || oldUser.getHistory_mark() != newUser.getHistory_mark()){
+            newUser.setConfirmed(false);
+        }
 
-        user.setId(Integer.parseInt(pathInfo.substring(1)));
-        UserService.updateUser(user);
+        newUser.setId(params.getInt("id"));
+        UserService.updateUser(newUser);
     }
 
     @Override

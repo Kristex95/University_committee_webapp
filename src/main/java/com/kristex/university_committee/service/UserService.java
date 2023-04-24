@@ -1,7 +1,6 @@
 package com.kristex.university_committee.service;
 
 import com.kristex.university_committee.dao.impl.UserDaoImpl;
-import com.kristex.university_committee.dao.impl.UserTokenDaoImpl;
 import com.kristex.university_committee.model.User;
 import com.kristex.university_committee.model.UserToken;
 import com.kristex.university_committee.utils.JWTUtils;
@@ -27,6 +26,13 @@ public class UserService {
 
     public List<User> getAllUser(){
         return  UserDaoImpl.getInstance().getAllUsers();
+    }
+    public List<User> getAllUsersByFacultyId(int id){
+        return UserDaoImpl.getInstance().getAllUsersByFacultyId(id);
+    }
+
+    public List<User> getAllUnconfirmedUsers(){
+        return UserDaoImpl.getInstance().getAllUnconfirmedUsers();
     }
     public static void createUser(User user){
         UserDaoImpl.getInstance().createUser(user);
@@ -55,18 +61,11 @@ public class UserService {
     }
 
     public static UserToken login(String email, String pass){
-        User user = getByEmail(email);
-        if(user.getCache().equals(hashPassword(pass))){
-            UserTokenService.createUserToken(new UserToken(
-                    user.getId(),
-                    JWTUtils.createAccessToken(String.valueOf(user.getId()), user.getRole()),
-                    JWTUtils.createRefreshToken(String.valueOf(user.getId()), user.getRole())));
-            return UserTokenDaoImpl.getInstance().getByUserId(user.getId());
-        }
-        else {
-            System.out.println("wrong password");
-            return null;
-        }
 
+        return null;
+    }
+
+    public static void confirmUser(int id) {
+        UserDaoImpl.getInstance().confirmUser(id);
     }
 }

@@ -6,6 +6,7 @@ import java.util.List;
 
 public interface RegistrationDao {
     Registration getById(int id);
+    Registration getByUserId(int id);
     List<Registration> getAllList();
     void createRegistration(Registration registration);
     void updateRegistration(Registration registration);

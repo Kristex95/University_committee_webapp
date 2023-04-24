@@ -16,14 +16,30 @@ public class User {
     String lastName;
     String email;
     Role role;
+    float school_mark;
+    int math_mark;
+    int english_mark;
+    int history_mark;
     String cache;
 
-    public User(String firstName, String lastName, String email, Role role, String cache){
+    boolean confirmed;
+
+    public User(String firstName, String lastName, String email, String cache){
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.cache = cache;
+    }
+
+    public User(String firstName, String lastName, String email, Role role, float school_mark, int math_mark, int english_mark, int history_mark) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.role = role;
-        this.cache = cache;
+        this.school_mark = school_mark;
+        this.math_mark = math_mark;
+        this.english_mark = english_mark;
+        this.history_mark = history_mark;
     }
 }
 

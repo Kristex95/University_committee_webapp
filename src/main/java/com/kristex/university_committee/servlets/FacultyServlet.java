@@ -2,7 +2,9 @@ package com.kristex.university_committee.servlets;
 
 import com.kristex.university_committee.dao.impl.FacultyDaoImpl;
 import com.kristex.university_committee.model.Faculty;
+import com.kristex.university_committee.model.User;
 import com.kristex.university_committee.service.FacultyService;
+import com.kristex.university_committee.service.UserService;
 import com.kristex.university_committee.utils.JSONParser;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -19,6 +21,8 @@ import java.util.List;
 @WebServlet("/faculty/*")
 public class FacultyServlet extends HttpServlet {
 
+    private final String FACULTY_USERS_SUBPATH = "/users/";
+
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
 
@@ -26,28 +30,29 @@ public class FacultyServlet extends HttpServlet {
         FacultyDaoImpl facultyDao = new FacultyDaoImpl();
         PrintWriter out = response.getWriter();
 
-        String facultyID = request.getPathInfo();
-        if(facultyID != null) {
+        String pathInfo = request.getPathInfo();
+        if(pathInfo != null) {
 
-    //By id
+            //By id
 
-            facultyID = facultyID.substring(1);
+            pathInfo = pathInfo.substring(1);
 
-            Faculty faculty = FacultyService.getInstance().GetFacultyById(Integer.valueOf(facultyID));
+            Faculty faculty = FacultyService.GetFacultyById(Integer.parseInt(pathInfo));
             if(faculty==null){
                 out.println("Faculty not found");
                 return;
             }
-            out.println(JSONParser.getInstance().getFacultyJSON(faculty));
+            out.println(JSONParser.getFacultyJSON(faculty));
+
         }
         else {
 
     //All
 
-            List<Faculty> facultyList = FacultyService.getInstance().GetAllFaculties();
+            List<Faculty> facultyList = FacultyService.GetAllFaculties();
             JSONArray jsonArray = new JSONArray();
             for (Faculty faculty: facultyList) {
-                jsonArray.put(JSONParser.getInstance().getFacultyJSON(faculty));
+                jsonArray.put(JSONParser.getFacultyJSON(faculty));
             }
             out.println(jsonArray);
         }

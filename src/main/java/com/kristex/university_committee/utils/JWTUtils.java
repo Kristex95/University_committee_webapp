@@ -4,6 +4,7 @@ import com.kristex.university_committee.model.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.json.JSONObject;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
@@ -13,8 +14,8 @@ import java.util.Date;
 public class JWTUtils {
 
     private static final String SECRET_KEY = "mysecretkey";
-    private static final long ACCESS_EXPIRATION_TIME_MS = 3600000; // 1 hour
-    private static final long REFRESH_EXPIRATION_TIME_MS = 36000000; // 1 hour
+    private static final long ACCESS_EXPIRATION_TIME_MS = 1 * 60 * 1000; // 1 min
+    private static final long REFRESH_EXPIRATION_TIME_MS = 20 * 60 * 1000; // 20 min
 
     private static final SignatureAlgorithm SIGNATURE_ALGORITHM = SignatureAlgorithm.HS256;
     private static final byte[] SECRET_KEY_BYTES = DatatypeConverter.parseBase64Binary(SECRET_KEY);
@@ -27,7 +28,7 @@ public class JWTUtils {
      * @param userRole the role of the user associated with the JWT
      * @return the JWT
      */
-    public static String createRefreshToken(String userId, Role userRole) {
+    public static String createRefreshToken(int userId, Role userRole) {
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
         Date expiration = new Date(nowMillis + REFRESH_EXPIRATION_TIME_MS);
@@ -41,7 +42,7 @@ public class JWTUtils {
                 .compact();
     }
 
-    public static String createAccessToken(String userId, Role userRole) {
+    public static String createAccessToken(int userId, Role userRole) {
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
         Date expiration = new Date(nowMillis + ACCESS_EXPIRATION_TIME_MS);
@@ -79,40 +80,29 @@ public class JWTUtils {
      * @return the user ID
      * @throws Exception if the JWT is invalid or does not contain a user ID claim
      */
-    public static String getUserIdFromToken(String token) throws Exception {
-        Claims claims = Jwts.parser()
-                .setSigningKey(SIGNING_KEY)
-                .parseClaimsJws(token)
-                .getBody();
-        if (claims == null) {
-            throw new Exception("Invalid token: null claims");
+    public static JSONObject getTokenParams(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(SIGNING_KEY)
+                    .parseClaimsJws(token)
+                    .getBody();
+            if (claims == null) {
+                return null;
+            }
+            Integer userId = claims.get("userId", Integer.class);
+            String userRole = claims.get("userRole", String.class);
+            if (userId == null || userRole == null) {
+                return null;
+            }
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("id", userId);
+            jsonObject.put("role", userRole);
+
+            return jsonObject;
+        }catch (Exception e){
+            //log4j
+            return  null;
         }
-        String userId = claims.get("userId", String.class);
-        if (userId == null) {
-            throw new Exception("Invalid token: missing user ID claim");
-        }
-        return userId;
     }
 
-    /**
-     * Get the user role from the given JWT.
-     *
-     * @param token the JWT
-     * @return the user role
-     * @throws Exception if the JWT is invalid or does not contain a user role claim
-     */
-    public static String getUserRoleFromToken(String token) throws Exception {
-        Claims claims = Jwts.parser()
-                .setSigningKey(SIGNING_KEY)
-                .parseClaimsJws(token)
-                .getBody();
-        if (claims == null) {
-            throw new Exception("Invalid token: null claims");
-        }
-        String userRole = claims.get("userRole", String.class);
-        if (userRole == null) {
-            throw new Exception("Invalid token: missing user role claim");
-        }
-        return userRole;
-    }
 }

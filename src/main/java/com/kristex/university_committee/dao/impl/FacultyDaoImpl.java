@@ -52,6 +52,34 @@ public class FacultyDaoImpl implements FacultyDao {
         return faculty;
     }
 
+    public List<Faculty> getAllFacultiesByUserId(int id){
+        List<Faculty> facultyList = new ArrayList<>();
+
+        ConnectionPool connectionPool = ConnectionPool.getConnectionPool();
+        try(Connection connection = connectionPool.getConnection()){
+            String query =  "SELECT faculty_id, name FROM registration\n" +
+                            "INNER JOIN faculty on registration.faculty_id = faculty.id\n" +
+                            "WHERE registration.user_id = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+
+            while(resultSet.next()){
+                int faculty_id = resultSet.getInt(1);
+                String name = resultSet.getString(2);
+                facultyList.add(new Faculty(faculty_id, name));
+            }
+
+            resultSet.close();
+            statement.close();
+            connectionPool.releaseConnection(connection);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return facultyList;
+    }
+
     public List<Faculty> getAllFaculties(){
         List<Faculty> facultyList = new ArrayList<>();
 

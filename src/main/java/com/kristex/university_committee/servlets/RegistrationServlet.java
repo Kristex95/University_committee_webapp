@@ -68,11 +68,7 @@ public class RegistrationServlet extends HttpServlet {
             //create
             Registration registration = new Registration(
                     json.getInt("user_id"),
-                    json.getInt("faculty_id"),
-                    json.getFloat("school_mark"),
-                    json.getInt("math_mark"),
-                    json.getInt("history_mark"),
-                    json.getInt("english_mark")
+                    json.getInt("faculty_id")
             );
 
             RegistrationService.createRegistration(registration);
@@ -87,11 +83,7 @@ public class RegistrationServlet extends HttpServlet {
 
         Registration registration = new Registration(
                 json.getInt("user_id"),
-                json.getInt("faculty_id"),
-                json.getFloat("school_mark"),
-                json.getInt("math_mark"),
-                json.getInt("history_mark"),
-                json.getInt("english_mark")
+                json.getInt("faculty_id")
         );
 
 
