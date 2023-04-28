@@ -2,6 +2,7 @@ package com.kristex.university_committee.dao;
 
 import com.kristex.university_committee.model.Registration;
 import com.kristex.university_committee.model.User;
+import org.json.JSONArray;
 
 import java.util.List;
 
@@ -15,6 +16,7 @@ public interface UserDao {
     void createUser(User user);
     void updateUser(User user);
     void deleteUser(int id);
-    User getByEmail(String email);
+    User getByEmail(String email, String auth_type);
     void confirmUser(int id);
+    JSONArray getAcceptedUsers(int faculty_id);
 }

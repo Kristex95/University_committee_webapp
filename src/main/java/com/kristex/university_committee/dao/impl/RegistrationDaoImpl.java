@@ -3,6 +3,7 @@ package com.kristex.university_committee.dao.impl;
 import com.kristex.university_committee.connection.ConnectionPool;
 import com.kristex.university_committee.dao.RegistrationDao;
 import com.kristex.university_committee.model.Registration;
+import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RegistrationDaoImpl implements RegistrationDao {
-
+    private static final Logger log = Logger.getLogger(RegistrationDaoImpl.class);
     private static RegistrationDaoImpl instance;
 
     public static synchronized RegistrationDaoImpl getInstance(){
@@ -39,12 +40,15 @@ public class RegistrationDaoImpl implements RegistrationDao {
 
                 registration = new Registration(id, user_id, faculty_id);
             }
+            else {
+                log.error("DB: got registration by id");
+            }
 
             resultSet.close();
             statement.close();
             connectionPool.releaseConnection(connection);
         }catch (Exception e){
-            System.out.println(e);
+            log.error("DB: " + e);
         }
 
         return registration;
@@ -68,12 +72,16 @@ public class RegistrationDaoImpl implements RegistrationDao {
 
                 registration = new Registration(registration_id, id, faculty_id);
             }
+            else{
+                log.error("DB: could not find registration by user id");
+            }
 
             resultSet.close();
             statement.close();
             connectionPool.releaseConnection(connection);
         }catch (Exception e){
-            System.out.println(e);
+            log.error("DB: " + e);
+            return null;
         }
 
         return registration;
@@ -89,19 +97,23 @@ public class RegistrationDaoImpl implements RegistrationDao {
             PreparedStatement statement = connection.prepareStatement(query);
             ResultSet resultIdSet = statement.executeQuery();
 
-            while(resultIdSet.next()){
-                int id = resultIdSet.getInt(1);
-                Registration registration = getById(id);
-
-                System.out.println(registration);
-                registrationList.add(registration);
+            if(!resultIdSet.next()){
+                log.error("DB: could get list of faculties by user id");
             }
-            System.out.println("<End of list>");
+            else {
+                do{
+                    int id = resultIdSet.getInt(1);
+                    Registration registration = getById(id);
+
+                    System.out.println(registration);
+                    registrationList.add(registration);
+                }while (resultIdSet.next());
+            }
             resultIdSet.close();
             statement.close();
             connectionPool.releaseConnection(connection);
         } catch (Exception e) {
-            System.out.println(e);
+            log.error("DB: " + e);
         }
 
         return registrationList;
@@ -122,13 +134,13 @@ public class RegistrationDaoImpl implements RegistrationDao {
 
 
             if (statement.executeUpdate() <= 0){
-                System.out.println("SQL cannot create Registration");
+                log.error("DB: could not create registration");
             }
 
             statement.close();
             connectionPool.releaseConnection(connection);
         }catch (Exception e){
-            System.out.println(e);
+            log.error("DB: " + e);
         }
     }
 
@@ -143,16 +155,16 @@ public class RegistrationDaoImpl implements RegistrationDao {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, registration.getUserId());
             statement.setInt(2, registration.getFacultyId());
-            statement.setInt(7, registration.getId());
+            statement.setInt(3, registration.getId());
 
             if (statement.executeUpdate() <= 0){
-                System.out.println("SQL cannot update Registration");
+                log.error("DB: could not update registration");
             }
 
             statement.close();
             connectionPool.releaseConnection(connection);
         }catch (Exception e){
-            System.out.println(e);
+            log.error("DB: " + e);
         }
     }
 
@@ -167,14 +179,14 @@ public class RegistrationDaoImpl implements RegistrationDao {
 
 
             if (statement.executeUpdate() <= 0){
-                System.out.println("SQL cannot delete Registration");
+                log.error("DB: could not delete registration");
             }
 
 
             statement.close();
             connectionPool.releaseConnection(connection);
         }catch (Exception e){
-            System.out.println(e);
+            log.error("DB: " + e);
         }
     }
 }

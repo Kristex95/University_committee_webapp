@@ -23,12 +23,19 @@ public class User {
     String cache;
 
     boolean confirmed;
+    String type_auth;
 
     public User(String firstName, String lastName, String email, String cache){
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.cache = cache;
+    }
+
+    public User(String firstName, String lastName, String email){
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
     }
 
     public User(String firstName, String lastName, String email, Role role, float school_mark, int math_mark, int english_mark, int history_mark) {

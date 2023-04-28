@@ -8,12 +8,14 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 import java.io.IOException;
 
 @WebServlet("/refresh-token")
 public class RefreshTokenServlet extends HttpServlet {
+    private static final Logger log = Logger.getLogger(RefreshTokenServlet.class);
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         JSONObject jsonParams = (JSONObject) req.getAttribute("params");
@@ -29,6 +31,7 @@ public class RefreshTokenServlet extends HttpServlet {
         }
         else {
             resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            log.error("Tokens were not refreshed. 'jsonParams' is empty");
         }
     }
 }

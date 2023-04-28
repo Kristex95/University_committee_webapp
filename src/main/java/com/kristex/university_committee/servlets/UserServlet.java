@@ -8,6 +8,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -17,6 +18,7 @@ import java.util.List;
 
 @WebServlet("/user/*")
 public class UserServlet extends HttpServlet {
+    private static final Logger log = Logger.getLogger(UserService.class);
 
     private final String FACULTY_USERS_SUBPATH = "/faculty/";
     private final String UNCONFIRMED_USERS_SUBPATH = "/unconfirmed/";
@@ -34,19 +36,15 @@ public class UserServlet extends HttpServlet {
                 //All users by faculty id
                 String faculty_id = pathInfo.substring(FACULTY_USERS_SUBPATH.length());
 
-                List<User> userList = UserService.getInstance().getAllUsersByFacultyId(Integer.parseInt(faculty_id));
-
-                if (userList.isEmpty()) {
+                JSONArray usersJSON = UserService.getInstance().getAcceptedUsersJSON(Integer.parseInt(faculty_id));
+                System.out.println(usersJSON);
+                if (usersJSON.length() == 0) {
                     System.out.println("No users");
+                    log.error("Users by faculty id " + faculty_id + " were not found");
                     return;
                 }
 
-
-                JSONArray jsonArray = new JSONArray();
-                for (User user : userList) {
-                    jsonArray.put(JSONParser.getUserSimpleJSON(user));
-                }
-                out.println(jsonArray);
+                out.println(usersJSON);
 
             } else if (pathInfo.contains(UNCONFIRMED_USERS_SUBPATH)) {
 
@@ -62,12 +60,16 @@ public class UserServlet extends HttpServlet {
                     jsonArray.put(JSONParser.getUserJSON(user));
                 }
                 out.println(jsonArray);
-
             } else if(pathInfo.contains("/client")){
                 //returns logged in user info
+                if(params == null){
+                    resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                    return;
+                }
                 User user = UserService.getInstance().getUserById(params.getInt("id"));
                 if (user == null) {
                     out.println("Abiturient not found");
+                    log.error("This user not found");
                     return;
                 }
 
@@ -78,10 +80,11 @@ public class UserServlet extends HttpServlet {
             else {
                 //one abiturient by id
 
-
-                User user = UserService.getInstance().getUserById(Integer.valueOf(pathInfo.substring(1)));
+                int id = Integer.parseInt(pathInfo.substring(1));
+                User user = UserService.getInstance().getUserById(id);
                 if (user == null) {
                     out.println("Abiturient not found");
+                    log.error("Specific user with id: " + id + " not found");
                     return;
                 }
 
@@ -98,12 +101,15 @@ public class UserServlet extends HttpServlet {
 //all abiturients
 
             List<User> userList = UserService.getInstance().getAllUser();
+            if(userList.isEmpty()){
+                log.error("User list is empty");
+                return;
+            }
             userList.sort((o1, o2) -> o1.getId() > o2.getId() ? 1 : -1);
 
             JSONArray array = new JSONArray();
-
             for (User user : userList) {
-                array.put(JSONParser.getUserWithFacultyJSON(user));
+                array.put(JSONParser.getUserSimpleJSON(user));
             }
             out.println(array);
         }
@@ -125,10 +131,12 @@ public class UserServlet extends HttpServlet {
                     json.getString("email"),
                     UserService.hashPassword(json.getString("pass")));
             UserService.createUser(user);
+            return;
         }
         else if (pathInfo.contains(CONFIRM_USERS_SUBPATH)) {
             JSONObject json = JSONParser.parseJSON(req);
             UserService.confirmUser(json.getInt("id"));
+            return;
         }
     }
 
@@ -143,6 +151,9 @@ public class UserServlet extends HttpServlet {
         User newUser = JSONParser.parseUserJSON(json);
 
         User oldUser = UserService.getInstance().getUserById(params.getInt("id"));
+        if(oldUser == null){
+            log.error("Could not update user with id: " + params.getInt("id") + ". User was not found in database");
+        }
 
         if(oldUser.getSchool_mark() != newUser.getSchool_mark() || oldUser.getMath_mark() != newUser.getMath_mark() || oldUser.getEnglish_mark() != newUser.getEnglish_mark() || oldUser.getHistory_mark() != newUser.getHistory_mark()){
             newUser.setConfirmed(false);
@@ -158,6 +169,7 @@ public class UserServlet extends HttpServlet {
         String pathInfo = req.getPathInfo();
 
         if(pathInfo==null || pathInfo.equals("/")){
+            log.error("Could not delete user");
             return;
         }
         int id = Integer.parseInt(pathInfo.substring(1));

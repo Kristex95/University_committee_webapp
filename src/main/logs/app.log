@@ -1,0 +1,10 @@
+2023-04-29 01:58:16,860 ERROR [com.kristex.university_committee.utils.JWTUtils] - Could not get local token params. Exception: io.jsonwebtoken.ExpiredJwtException: JWT expired at 2023-04-29T01:58:08Z. Current time: 2023-04-29T01:58:16Z, a difference of 8859 milliseconds.  Allowed clock skew: 0 milliseconds.
+2023-04-29 01:58:16,860 ERROR [com.kristex.university_committee.filter.AuthMiddleware] - Could not get user params from token
+2023-04-29 01:58:16,860 ERROR [com.kristex.university_committee.utils.JWTUtils] - Could not get local token params. Exception: io.jsonwebtoken.ExpiredJwtException: JWT expired at 2023-04-29T01:58:08Z. Current time: 2023-04-29T01:58:16Z, a difference of 8859 milliseconds.  Allowed clock skew: 0 milliseconds.
+2023-04-29 01:58:16,860 ERROR [com.kristex.university_committee.filter.AuthMiddleware] - Could not get user params from token
+2023-04-29 01:58:42,467 ERROR [com.kristex.university_committee.utils.JWTUtils] - Could not get auth0 token params
+2023-04-29 01:58:52,944 ERROR [com.kristex.university_committee.utils.JWTUtils] - Could not get local token params. Exception: io.jsonwebtoken.MalformedJwtException: JWT strings must contain exactly 2 period characters. Found: 0
+2023-04-29 01:58:52,944 ERROR [com.kristex.university_committee.filter.AuthMiddleware] - Could not get user params from token
+2023-04-29 01:59:05,493 ERROR [com.kristex.university_committee.utils.JWTUtils] - Could not get local token params. Exception: io.jsonwebtoken.MalformedJwtException: JWT strings must contain exactly 2 period characters. Found: 0
+2023-04-29 01:59:05,493 ERROR [com.kristex.university_committee.filter.AuthMiddleware] - Could not get user params from token
+2023-04-29 01:59:18,877 ERROR [com.kristex.university_committee.utils.JWTUtils] - Could not get auth0 token params

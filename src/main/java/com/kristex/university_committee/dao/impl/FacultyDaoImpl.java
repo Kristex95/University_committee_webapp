@@ -4,6 +4,7 @@ package com.kristex.university_committee.dao.impl;
 import com.kristex.university_committee.connection.ConnectionPool;
 import com.kristex.university_committee.dao.FacultyDao;
 import com.kristex.university_committee.model.Faculty;
+import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FacultyDaoImpl implements FacultyDao {
+    private static final Logger log = Logger.getLogger(FacultyDaoImpl.class);
 
     private static FacultyDaoImpl instance;
 
@@ -38,15 +40,15 @@ public class FacultyDaoImpl implements FacultyDao {
                 faculty = new Faculty(facultyId, facultyName);
             }
             else{
-                System.out.println("Faculty not found");
-                return null;
+                log.error("DB: Faculty by id was not found");
             }
 
             resultSet.close();
             statement.close();
             connectionPool.releaseConnection(connection);
         } catch (Exception e) {
-            System.out.println(e);
+            log.error("DB: " + e);
+            return null;
         }
 
         return faculty;
@@ -64,17 +66,23 @@ public class FacultyDaoImpl implements FacultyDao {
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
 
-            while(resultSet.next()){
-                int faculty_id = resultSet.getInt(1);
-                String name = resultSet.getString(2);
-                facultyList.add(new Faculty(faculty_id, name));
+            if(!resultSet.next()){
+                log.error("DB: could not get list of faculties by user id");
+            }
+            else {
+                do{
+                    int faculty_id = resultSet.getInt(1);
+                    String name = resultSet.getString(2);
+                    facultyList.add(new Faculty(faculty_id, name));
+                }while (resultSet.next());
             }
 
             resultSet.close();
             statement.close();
             connectionPool.releaseConnection(connection);
         } catch (Exception e) {
-            System.out.println(e);
+            log.error("DB: " + e);
+            return null;
         }
 
         return facultyList;
@@ -89,17 +97,23 @@ public class FacultyDaoImpl implements FacultyDao {
             PreparedStatement statement = connection.prepareStatement(query);
             ResultSet resultSet = statement.executeQuery();
 
-            while(resultSet.next()){
-                int id = resultSet.getInt(1);
-                String name = resultSet.getString(2);
-                facultyList.add(new Faculty(id, name));
+            if(!resultSet.next()){
+                log.error("DB: could get list of faculties");
+            }
+            else {
+                do {
+                    int id = resultSet.getInt(1);
+                    String name = resultSet.getString(2);
+                    facultyList.add(new Faculty(id, name));
+                } while (resultSet.next());
             }
 
             resultSet.close();
             statement.close();
             connectionPool.releaseConnection(connection);
         } catch (Exception e) {
-            System.out.println(e);
+            log.error("DB: could not list of faculties");
+            return null;
         }
 
         return facultyList;
@@ -115,13 +129,13 @@ public class FacultyDaoImpl implements FacultyDao {
             statement.setString(1, faculty.getName());
 
             if (statement.executeUpdate() <= 0){
-                System.out.println("SQL cannot create Faculty");
+                log.error("DB: could not create faculty");
             }
 
             statement.close();
             connectionPool.releaseConnection(connection);
         } catch (Exception e) {
-            System.out.println(e);
+            log.error("DB: " + e);
         }
     }
 
@@ -137,13 +151,15 @@ public class FacultyDaoImpl implements FacultyDao {
             statement.setInt(2, faculty.getId());
 
             if (statement.executeUpdate() <= 0){
-                System.out.println("SQL cannot update Faculty");
+                statement.close();
+                connectionPool.releaseConnection(connection);
+                log.error("DB: could not update faculty");
             }
 
             statement.close();
             connectionPool.releaseConnection(connection);
         } catch (Exception e) {
-            System.out.println(e);
+            log.error("DB: " + e);
         }
     }
 
@@ -157,13 +173,15 @@ public class FacultyDaoImpl implements FacultyDao {
             statement.setInt(1, id);
 
             if (statement.executeUpdate() <= 0){
-                System.out.println("SQL cannot delete Faculty");
+                statement.close();
+                connectionPool.releaseConnection(connection);
+                log.error("DB: could not delete faculty");
             }
 
             statement.close();
             connectionPool.releaseConnection(connection);
         } catch (Exception e) {
-            System.out.println(e);
+            log.error("DB: " + e);
         }
     }
 }

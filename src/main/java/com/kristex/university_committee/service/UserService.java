@@ -4,6 +4,7 @@ import com.kristex.university_committee.dao.impl.UserDaoImpl;
 import com.kristex.university_committee.model.User;
 import com.kristex.university_committee.model.UserToken;
 import com.kristex.university_committee.utils.JWTUtils;
+import org.json.JSONArray;
 
 import java.security.MessageDigest;
 import java.util.Base64;
@@ -56,8 +57,8 @@ public class UserService {
         }
     }
 
-    public static User getByEmail(String email){
-        return UserDaoImpl.getInstance().getByEmail(email);
+    public static User getByEmail(String email, String auth_type){
+        return UserDaoImpl.getInstance().getByEmail(email, auth_type);
     }
 
     public static UserToken login(String email, String pass){
@@ -67,5 +68,8 @@ public class UserService {
 
     public static void confirmUser(int id) {
         UserDaoImpl.getInstance().confirmUser(id);
+    }
+    public static JSONArray getAcceptedUsersJSON(int faculty_id){
+        return UserDaoImpl.getInstance().getAcceptedUsers(faculty_id);
     }
 }

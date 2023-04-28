@@ -55,6 +55,7 @@ public class JSONParser {
         for (Faculty faculty: facultyList) {
             JSONObject facultyObject = new JSONObject();
             facultyObject.put("faculty", faculty.getName());
+            facultyObject.put("id", faculty.getId());
             array.put(facultyObject);
         }
         json.put("faculties", array);
@@ -125,4 +126,5 @@ public class JSONParser {
     }
 
 //endregion
+
 }

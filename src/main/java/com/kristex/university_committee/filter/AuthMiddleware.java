@@ -1,16 +1,18 @@
-package com.kristex.university_committee.servlets;
+package com.kristex.university_committee.filter;
 
 import com.kristex.university_committee.utils.JWTUtils;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 import java.io.IOException;
 
 @WebFilter(urlPatterns = "/*", filterName = "authFilter")
 public class AuthMiddleware implements Filter {
+    private static final Logger log = Logger.getLogger(AuthMiddleware.class);
     private final static String AUTH_HEADER = "Authorization";
     private final static String AUTH_HEADER_START = "Bearer ";
 
@@ -29,7 +31,7 @@ public class AuthMiddleware implements Filter {
                 filterChain.doFilter(servletRequest, servletResponse);
             }
             else {
-                System.out.println("401");
+                log.error("Could not get user params from token");
                 httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             }
         }

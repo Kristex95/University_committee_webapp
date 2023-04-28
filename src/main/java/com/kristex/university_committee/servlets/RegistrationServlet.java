@@ -9,6 +9,7 @@ import com.kristex.university_committee.utils.JSONParser;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -18,6 +19,7 @@ import java.util.List;
 
 @WebServlet(name = "RegistrationServlet", value = "/registration/*")
 public class RegistrationServlet extends HttpServlet {
+    private static final Logger log = Logger.getLogger(RegistrationServlet.class);
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json");
@@ -32,7 +34,8 @@ public class RegistrationServlet extends HttpServlet {
 
             Registration registration = RegistrationService.getById(regId);
             if(registration ==null){
-                out.println("Abiturient not found");
+                out.println("Registration not found");
+                log.error("Registration was not found");
                 return;
             }
 
@@ -44,9 +47,13 @@ public class RegistrationServlet extends HttpServlet {
         }
         else {
 
-//all abiturients
+//all Registrations
 
             List<Registration> registrationList = RegistrationService.getAllList();
+            if(registrationList.isEmpty()){
+                log.error("Registration list is empty");
+                return;
+            }
             registrationList.sort((o1, o2) -> o1.getId() > o2.getId() ? 1 : -1);
 
             JSONArray array = new JSONArray();
@@ -63,15 +70,18 @@ public class RegistrationServlet extends HttpServlet {
         resp.setContentType("application/json");
         String pathInfo = req.getPathInfo();
         JSONObject json = JSONParser.parseJSON(req);
-
+        JSONObject paramsJSON = (JSONObject) req.getAttribute("params");
         if(pathInfo == null || pathInfo.equals("/")) {
             //create
             Registration registration = new Registration(
-                    json.getInt("user_id"),
+                    paramsJSON.getInt("id"),
                     json.getInt("faculty_id")
             );
 
             RegistrationService.createRegistration(registration);
+        }
+        else {
+            log.error("Could not create registration");
         }
     }
 
@@ -97,6 +107,7 @@ public class RegistrationServlet extends HttpServlet {
         String pathInfo = req.getPathInfo();
 
         if(pathInfo==null || pathInfo.equals("/")){
+            log.error("Could not delete registration");
             return;
         }
         int id = Integer.parseInt(pathInfo.substring(1));
