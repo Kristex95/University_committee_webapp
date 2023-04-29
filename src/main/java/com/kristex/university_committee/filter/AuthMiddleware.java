@@ -14,7 +14,7 @@ import java.io.IOException;
 public class AuthMiddleware implements Filter {
     private static final Logger log = Logger.getLogger(AuthMiddleware.class);
     private final static String AUTH_HEADER = "Authorization";
-    private final static String AUTH_HEADER_START = "Bearer ";
+    private final static String BEARER_PREFIX = "Bearer ";
 
 
     @Override
@@ -23,8 +23,8 @@ public class AuthMiddleware implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
         String authorizationHeader = httpRequest.getHeader(AUTH_HEADER);
 
-        if(authorizationHeader != null && authorizationHeader.startsWith(AUTH_HEADER_START)){
-            String token = authorizationHeader.substring(AUTH_HEADER_START.length());
+        if(authorizationHeader != null && authorizationHeader.startsWith(BEARER_PREFIX)){
+            String token = authorizationHeader.substring(BEARER_PREFIX.length());
             JSONObject jsonObject = JWTUtils.getTokenParams(token);
             if (jsonObject != null){
                 httpRequest.setAttribute("params", jsonObject);
@@ -32,7 +32,7 @@ public class AuthMiddleware implements Filter {
             }
             else {
                 log.error("Could not get user params from token");
-                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             }
         }
         else{
